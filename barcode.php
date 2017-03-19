@@ -51,7 +51,7 @@ class barcode {
         }
     }
 
-    public function build($code = null, $name=null){
+    public function build($code = null, $name=null, $src = null){
         if(is_null($code)){
             $this->code = '00000000000';
         } else {
@@ -73,7 +73,7 @@ class barcode {
 
             $checkdigit = 10 - $checksum%10;
 
-            $this->code.=$checkdigit;
+            $code.=$checkdigit;
             $code_display = $code;
             $code = "*".substr($code,0,6)."#".substr($code,6,6)."*";
 
@@ -110,12 +110,12 @@ class barcode {
                 }
             }
 
-            /*$font = "Aller/Aller_Rg.ttf";
+            $font = "Aller/Aller_Rg.ttf";
 
             $digit1 = substr($code_display,0,1);
             $leftdigits = substr($code_display,1,5);
-            $rightdigits = substr($code_display,6,5);
-            $digit12 = substr($code_display,11,1);
+            $rightdigits = substr($code_display,5,5);
+            $digit12 = substr($code_display,10,1);
 
             $outterdigitsscale = $this->barwidth*5;
             $innerdigitsscale = $this->barwidth/0.14;
@@ -129,16 +129,34 @@ class barcode {
 
             $middleSpace = 43*$this->barwidth;
 
-            $digit1_x =$this->border+($this->padding);
+            $digit1_x =$this->border+($this->padding-$digit1_xy[2]-$digit1_xy[0])/2;
+            $leftdigits_x= $this->border + $this->padding + $this->barwidth*3+($middleSpace- $left_digits_xy[2]-$left_digits_xy[0])/2;
+            $right_digits_x = $this->border + $this->padding + $this->barwidth*3 + $middleSpace + ($middleSpace-$right_digits_xy[2]-$right_digits_xy[0])/2;
+            $digit12_x = $this->border + $this->padding + $this->barwidth*6 + 2*$middleSpace + ($this->padding -$digit12_xy[2] -$digit12_xy[0])/2;
+            $label_x = ($this->width - 2*$this->border- $label_xy[2]-$label_xy[0])/2;
+            $label_y = ($this->padding - $label_xy[7] - $label_xy[1])/2;
 
-            + parte per i numeri
-
-            */
-
+            imagettftext($barcode, $outterdigitsscale,0,$digit1_x,$this->barheight - ($this->padding/2)+  $this->border, $black,$font, $digit1);
+            imagettftext($barcode, $innerdigitsscale,0, $leftdigits_x, $this->barheight - ($this->padding/2)+$this->border, $black, $font, $leftdigits);
+            imagettftext($barcode, $innerdigitsscale,0, $right_digits_x, $this->barheight - ($this->padding/2)+$this->border, $black, $font,  $rightdigits);
+            imagettftext($barcode, $outterdigitsscale,0, $digit12_x, $this->barheight - ($this->padding/2)+$this->border, $black, $font, $digit12);
+            imagettftext($barcode, $labelscale,0,$label_x,$label_y,$black,$font,$this->label);
 
 
             header("Content-type: image/gif");
-            imagepng($barcode);
+            
+            if(is_null($name)){
+                imagepng($barcode);
+            } else {
+                if(is_null($src)){
+                    $name = $name.".gif";
+                    imagepng($barcode, $name);
+                }else {
+                    $name = $name.".gif";
+                    $src = $src."/".$name;
+                    imagepng($barcode, $src);
+                }
+            }
             imagedestroy($barcode);
         }
     }

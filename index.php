@@ -8,4 +8,4 @@
 include "barcode.php";
 $bar = new barcode(null,4);
 $number = "36627634746";
-$bar->build($number);
+$bar->build($number, "prova", "");
